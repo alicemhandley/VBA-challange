@@ -1,0 +1,145 @@
+Sub WorksheetLoop()
+
+Dim ws As Worksheet
+
+For Each ws In Worksheets
+    ws.Activate
+
+'Sub stockdata()
+
+' set an initial variable for stock identifier
+Dim ticker As String
+
+' set an initial variable for opening price
+Dim opening_price As Double
+
+opening_price = Range("C2").Value
+
+' set an initial variable for closing price
+Dim closing_price As Double
+closing_price = 0
+
+' set an initial variable for trading volume
+Dim stock_volume As LongLong
+stock_volume = 0
+
+' set yearly_change variable
+Dim yearly_change As Double
+yearly_change = 0
+
+' set percentage_change variable
+Dim percentage_change As Double
+percentage_change = 0
+
+' Keep track of the location for each ticker in the summary table
+  Dim Summary_Table_Row As Integer
+  Summary_Table_Row = 2
+
+' keep track of opening_price_counter
+  Dim opening_price_counter As Double
+  opening_price_counter = 2
+
+' Loop through all stock data
+lastRow = Cells(Rows.Count, 1).End(xlUp).Row
+'from https://git.bootcampcontent.com/
+
+ If closing_price = 0 Then
+ opening_price = Range("C2").Value
+
+' Print the opening_price to the Summary Table
+      Range("J" & Summary_Table_Row).Value = opening_price
+
+End If
+
+For I = 2 To lastRow
+
+' Check if we are still within the same ticker, if it is not...
+    If Cells(I + 1, 1).Value <> Cells(I, 1).Value Then
+    
+    ' Set ticker
+      ticker = Cells(I, 1).Value
+    
+    ' set opening_price
+     opening_price = Cells(opening_price_counter, 3).Value
+     opening_price_counter = I + 1
+    
+    ' set closing_price
+      closing_price = Cells(I, 6).Value
+    
+    ' Add to the stock_volume
+      stock_volume = stock_volume + Cells(I, 7).Value
+     'from https://git.bootcampcontent.com/
+
+'set summary table headers
+Range("I1").Value = "ticker"
+Range("J1").Value = "opening_price"
+Range("K1").Value = "closing_price"
+Range("L1").Value = "stock_volume"
+Range("M1").Value = "yearly_change"
+Range("N1").Value = "percentage_change"
+
+' Print the ticker in the Summary Table
+      Range("I" & Summary_Table_Row).Value = ticker
+      
+' Print the opening_price to the Summary Table
+      Range("J" & Summary_Table_Row).Value = opening_price
+      
+' Print the closing_price to the Summary Table
+      Range("K" & Summary_Table_Row).Value = closing_price
+      
+' Prin the stock_volume to the Summary Table
+      Range("L" & Summary_Table_Row).Value = stock_volume
+
+' Calculate yearly_change
+      yearly_change = closing_price - opening_price
+          
+' Print yearly_change to the Summary Table
+      Range("M" & Summary_Table_Row).Value = yearly_change
+      
+' Format yearly_change
+ 
+ If yearly_change > 0 Then
+    Range("M" & Summary_Table_Row).Interior.ColorIndex = 4
+    ElseIf yearly_change < 0 Then
+    Range("M" & Summary_Table_Row).Interior.ColorIndex = 3
+    Else
+    Range("M" & Summary_Table_Row).Interior.ColorIndex = 0
+            
+  End If
+          
+' Calculate percentage_change over the year
+      percentage_change = (yearly_change / opening_price) * 100
+      
+' Print percentage_change to the Summary Table
+      Range("N" & Summary_Table_Row).Value = percentage_change
+      
+  If percentage_change > 0 Then
+    Range("N" & Summary_Table_Row).Interior.ColorIndex = 4
+    ElseIf percentage_change < 0 Then
+    Range("N" & Summary_Table_Row).Interior.ColorIndex = 3
+    Else
+    Range("N" & Summary_Table_Row).Interior.ColorIndex = 0
+            
+  End If
+      
+       ' Add one to the summary table row
+      Summary_Table_Row = Summary_Table_Row + 1
+     
+
+
+' Reset the stock_volume
+      stock_volume = 0
+
+' If the cell immediately following a row is the same stock...
+    Else
+
+' Add to the stock_volume
+      stock_volume = stock_volume + Cells(I, 7).Value
+
+      End If
+      
+    Next I
+    
+  Next
+     
+End Sub
